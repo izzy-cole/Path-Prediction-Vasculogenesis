@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection,LineCollection
 from matplotlib.patches import Circle
 
+import numpy as np
+
 from config import max_difficulty
 
 def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1,all_treads=None):
@@ -72,3 +74,31 @@ def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1
             col_count += 1
     lc = LineCollection(tread_lines, colors=tread_cols, alpha=1, linewidths=3)
     ax.add_collection(lc)
+
+def visualise_network_treads(nodes,adj,tread_counts,image=None,im_alpha=1,node_size=0.1,edge_width=1):
+    fig,ax=plt.subplots(figsize=(10,10))
+    ax.axis('off') 
+
+    tread_counts = tread_counts / np.max(tread_counts)
+
+    #Code for nodes
+    patches = []
+    weight_arr = nodes['weight'].values
+    cmap = mpl.colormaps['Reds']
+
+    xs = nodes["x"].values
+    ys = nodes["y"].values
+
+    for i in nodes.index:
+        x = xs[i]
+        y = ys[i]
+        print(i)
+        print(tread_counts[i])
+
+        node_col = cmap(tread_counts[i])
+        circle = Circle((x, y), node_size,color=node_col)
+
+        patches.append(circle)
+
+    pc = PatchCollection(patches, alpha=1,match_original=True)
+    ax.add_collection(pc)

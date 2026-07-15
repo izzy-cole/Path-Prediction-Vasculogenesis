@@ -98,8 +98,9 @@ def gen_networkx_graph(nodes,adj):
     return G
 
 
-def stochastic_paths(nodes,adj,n,start_type="posterior",end_type="blood island",display_paths=False,display_treads=True):
+def stochastic_paths(nodes,adj,n,start_type="posterior",end_type="blood island",display_paths=False,display_treads=True,image=None):
     G = gen_networkx_graph(nodes,adj)
+    print("Network generation finished")
     random.seed(1)
 
     all_tread = []
@@ -117,12 +118,12 @@ def stochastic_paths(nodes,adj,n,start_type="posterior",end_type="blood island",
             tread_counts[j] += 1
 
     if display_paths:
-        visualisation.visualise_network(nodes,adj,all_treads=all_tread)
+        visualisation.visualise_network(nodes,adj,all_treads=all_tread,image=image,im_alpha=0)
         plt.show()
 
     if display_treads:
-        print("Todo")
-    
+        visualisation.visualise_network_treads(nodes,adj,tread_counts,image=image,im_alpha=0)
+        plt.show()
     #return net,path_tread
 
 #Model flow:
