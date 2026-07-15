@@ -52,23 +52,32 @@ def difficulty_fn(weight1,weight2):
 
 def initialise_edges(nodes):
     n = len(nodes.index)
-    adj = pd.DataFrame(data=np.full((n,n),np.nan))
+    adj = np.full((n,n),np.nan)
+    weights = nodes["weight"].values
+    xs = nodes["x"].values
+    ys = nodes["y"].values
+
+    coord_to_id = {}
+    for i in range(n):
+        coord = (xs[i],ys[i])
+        coord_to_id[coord] = i
 
     for i in nodes.index:
-        x1,y1,weight1 = nodes.loc[i,"x"],nodes.loc[i,"y"],nodes.loc[i,"weight"]
-
+        x1 = xs[i]
+        y1 = ys[i]
+        weight1 = weights[i]
         neighbours = [[x1-1,y1],[x1,y1-1],[x1-1,y1-1],[x1+1,y1],[x1,y1+1],[x1+1,y1+1],[x1-1,y1+1],[x1+1,y1-1]]
         for j in neighbours:
             x2,y2 = j[0],j[1]
-            neighbour_id = coords_to_id(nodes,x2,y2)
+            neighbour_id = coord_to_id.get((x2, y2), -1)
             if neighbour_id != -1: #check neighbour exists (e.g. not part of red "ignored" zone)
                 weight2 = nodes.loc[neighbour_id,"weight"]
 
                 #Use the difficulty function to determine the edge "difficulty"/weight
                 new_diff = difficulty_fn(weight1,weight2)
 
-                adj.loc[i,neighbour_id] = new_diff
-                adj.loc[neighbour_id,i] = new_diff
+                adj[i,neighbour_id] = new_diff
+                adj[neighbour_id,i] = new_diff
     return adj
 
 #Model flow:
