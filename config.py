@@ -1,0 +1,1 @@
+max_difficulty = 20
