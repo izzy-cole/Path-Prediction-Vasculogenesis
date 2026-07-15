@@ -6,6 +6,7 @@ import networkx as nx
 import os
 import random
 from config import max_difficulty
+import visualisation
 
 def initialise_nodes(image):
     #set up a simple network where each pixel is a node
@@ -79,6 +80,50 @@ def initialise_edges(nodes):
                 adj[i,neighbour_id] = new_diff
                 adj[neighbour_id,i] = new_diff
     return adj
+
+def gen_networkx_graph(nodes,adj):
+    G = nx.Graph()
+
+    for i in nodes.index:
+        node = nodes.loc[i]
+        #G.add_node(i)#,weight=node["weight"])
+        G.add_nodes_from([(i, {"x": int(node["x"]), "y": int(node["y"]), "weight":float(node["weight"])})])
+
+    for i in range(len(adj)):
+        for j in range(len(adj)):
+            weight = adj[i,j]
+            if not np.isnan(weight):
+                G.add_edge(i,j,weight=weight)
+    #nx.draw(G, with_labels=True)
+    return G
+
+
+def stochastic_paths(nodes,adj,n,start_type="posterior",end_type="blood island",display_paths=False,display_treads=True):
+    G = gen_networkx_graph(nodes,adj)
+    random.seed(1)
+
+    all_tread = []
+    tread_counts = np.zeros(len(nodes))
+
+    for i in range(n):
+        start_id = random.choice(nodes[nodes["type"]==start_type].index)
+        end_id = random.choice(nodes[nodes["type"]==end_type].index)
+
+        print(start_id,end_id)
+
+        sp = nx.shortest_path(G,start_id,end_id,weight="weight")
+        all_tread.append(sp)
+        for j in sp:
+            tread_counts[j] += 1
+
+    if display_paths:
+        visualisation.visualise_network(nodes,adj,all_treads=all_tread)
+        plt.show()
+
+    if display_treads:
+        print("Todo")
+    
+    #return net,path_tread
 
 #Model flow:
 #1. Read image and set up a network of nodes and edges, with weights depending on the node intensity (difficulty parameter). Diagonals?

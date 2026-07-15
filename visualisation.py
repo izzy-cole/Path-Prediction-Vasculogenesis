@@ -5,7 +5,7 @@ from matplotlib.patches import Circle
 
 from config import max_difficulty
 
-def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1):
+def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1,all_treads=None):
     fig,ax=plt.subplots(figsize=(10,10))
     if image is not None:
         ax.imshow(image,cmap=plt.cm.gray,alpha=im_alpha)
@@ -35,14 +35,12 @@ def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1
 
     #Code for nodes
     patches = []
-    x_arr = nodes['x'].values
-    y_arr = nodes['y'].values
     weight_arr = nodes['weight'].values
     type_arr = nodes['type'].values
     cmap = mpl.colormaps['Reds']
     for i in nodes.index:
-        x = x_arr[i]
-        y = y_arr[i]
+        x = xs[i]
+        y = ys[i]
         weight = weight_arr[i]
         n_type = type_arr[i]
 
@@ -55,3 +53,22 @@ def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1
 
     pc = PatchCollection(patches, alpha=1,match_original=True)
     ax.add_collection(pc)
+
+    #Code to display path generated
+    tread_lines = []
+    tread_cols = []
+    if all_treads is not None:
+        col_count = 0
+        cmap = mpl.colormaps['gist_rainbow']
+        for tread in all_treads:
+            tread_col = cmap(col_count/len(all_treads))
+            for i in range(len(tread)-1):
+                id1 = tread[i]
+                id2 = tread[i+1]
+                x1,y1 = xs[id1],ys[id1]
+                x2,y2 = xs[id2],ys[id2]
+                tread_lines.append([(x1,y1),(x2,y2)])
+                tread_cols.append(tread_col)
+            col_count += 1
+    lc = LineCollection(tread_lines, colors=tread_cols, alpha=1, linewidths=3)
+    ax.add_collection(lc)
