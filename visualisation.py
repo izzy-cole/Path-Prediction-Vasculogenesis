@@ -7,11 +7,14 @@ import numpy as np
 
 from config import max_difficulty
 
-def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1,all_treads=None):
+def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1,all_treads=None,coords=[0,0],size=None):
     fig,ax=plt.subplots(figsize=(10,10))
     if image is not None:
         ax.imshow(image,cmap=plt.cm.gray,alpha=im_alpha)
     ax.axis('off') 
+
+    if size is None:
+        size = [len(image[0]),len(image)]
 
     xs = nodes["x"].values
     ys = nodes["y"].values
@@ -61,7 +64,7 @@ def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1
     tread_cols = []
     if all_treads is not None:
         col_count = 0
-        cmap = mpl.colormaps['gist_rainbow']
+        cmap = mpl.colormaps['rainbow']
         for tread in all_treads:
             tread_col = cmap(col_count/len(all_treads))
             for i in range(len(tread)-1):
@@ -74,6 +77,9 @@ def visualise_network(nodes,adj,image=None,im_alpha=1,node_size=0.1,edge_width=1
             col_count += 1
     lc = LineCollection(tread_lines, colors=tread_cols, alpha=1, linewidths=3)
     ax.add_collection(lc)
+
+    plt.xlim(coords[0],coords[0]+size[0])
+    plt.ylim(coords[1],coords[1]+size[1])
 
 def visualise_network_treads(nodes,adj,tread_counts,image=None,im_alpha=1,node_size=0.1,edge_width=1):
     fig,ax=plt.subplots(figsize=(10,10))
@@ -92,8 +98,6 @@ def visualise_network_treads(nodes,adj,tread_counts,image=None,im_alpha=1,node_s
     for i in nodes.index:
         x = xs[i]
         y = ys[i]
-        print(i)
-        print(tread_counts[i])
 
         node_col = cmap(tread_counts[i])
         circle = Circle((x, y), node_size,color=node_col)

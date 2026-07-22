@@ -5,6 +5,8 @@ import pandas as pd
 import networkx as nx
 import os
 import random
+#import scipy
+
 from config import max_difficulty
 import visualisation
 
@@ -105,12 +107,14 @@ def stochastic_paths(nodes,adj,n,start_type="posterior",end_type="blood island",
 
     all_tread = []
     tread_counts = np.zeros(len(nodes))
-
+    start_list = nodes[nodes["type"]==start_type].index
+    end_list = nodes[nodes["type"]==end_type].index
+    if len(start_list)==0:
+        print("Error: no valid start points")
+        return -1
     for i in range(n):
-        start_id = random.choice(nodes[nodes["type"]==start_type].index)
-        end_id = random.choice(nodes[nodes["type"]==end_type].index)
-
-        print(start_id,end_id)
+        start_id = random.choice(start_list)
+        end_id = random.choice(end_list)
 
         sp = nx.shortest_path(G,start_id,end_id,weight="weight")
         all_tread.append(sp)
@@ -122,9 +126,34 @@ def stochastic_paths(nodes,adj,n,start_type="posterior",end_type="blood island",
         plt.show()
 
     if display_treads:
-        visualisation.visualise_network_treads(nodes,adj,tread_counts,image=image,im_alpha=0)
+        visualisation.visualise_network_treads(nodes,adj,tread_counts,image=image,im_alpha=0.5)
         plt.show()
     #return net,path_tread
+
+
+def cellular_growth():
+    print("testing")
+    #Set up a growth function
+
+def cellular_automata(nodes,adj,radius):
+    #Setup a square kernel of radius R, set the centre to 0, and normalise
+    #todo: make kernel circular
+    kernel = np.ones((2*radius+1,2*radius+1))
+    kernel[radius,radius] = 0
+    kernel = kernel / np.sum(kernel)
+
+    #Setup a 2d array node structure A
+    #Apply the convolution to get the neighbour weight
+    U = scipy.signal.convolve2d(A, kernel, mode='same', boundary='wrap')
+    #Compare U to the growth function and update A
+
+def epoch(nodes,adj,n_paths, strength):
+    print("test")
+    #Generate n random paths
+    #Add the tread information with some weight
+    #Run cellular automata
+    #Repeat, animate
+
 
 #Model flow:
 #1. Read image and set up a network of nodes and edges, with weights depending on the node intensity (difficulty parameter). Diagonals?
@@ -136,3 +165,4 @@ def stochastic_paths(nodes,adj,n,start_type="posterior",end_type="blood island",
 #5. Create an "iterating" model (git branch) where random paths work in an iterating loop, updating the node and adjacency weights
 #6. Add some factors of cellular automata to maintain or decay existing nodes
 #7. File handling and saving
+
